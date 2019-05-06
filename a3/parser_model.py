@@ -50,6 +50,11 @@ class ParserModel(nn.Module):
         self.pretrained_embeddings.weight = nn.Parameter(torch.tensor(embeddings))
 
         ### YOUR CODE HERE (~5 Lines)
+        self.embed_to_hidden = nn.Linear(self.embed_size * self.n_features ,self.hidden_size)
+        nn.init.xavier_uniform_(self.embed_to_hidden.weight)
+        self.dropout = nn.Dropout(self.dropout_prob)
+        self.hidden_to_logits = nn.Linear(self.hidden_size,self.n_classes)
+        nn.init.xavier_uniform_(self.hidden_to_logits.weight)
         ### TODO:
         ###     1) Construct `self.embed_to_hidden` linear layer, initializing the weight matrix
         ###         with the `nn.init.xavier_uniform_` function with `gain = 1` (default)
@@ -105,7 +110,8 @@ class ParserModel(nn.Module):
         ###     View: https://pytorch.org/docs/stable/tensors.html#torch.Tensor.view
 
 
-        ### END YOUR CODE
+        x = self.pretrained_embeddings(t)
+        x = x.view(t.shape[0],self.n_features*self.embed_size)
         return x
 
 
@@ -129,6 +135,11 @@ class ParserModel(nn.Module):
                                  without applying softmax (batch_size, n_classes)
         """
         ###  YOUR CODE HERE (~3-5 lines)
+        embeddings = self.embedding_lookup(t)
+        temp = self.embed_to_hidden(embeddings)
+        temp = F.relu(temp)
+        temp = self.dropout(temp)
+        logits = self.hidden_to_logits(temp)
         ### TODO:
         ###     1) Apply `self.embedding_lookup` to `t` to get the embeddings
         ###     2) Apply `embed_to_hidden` linear layer to the embeddings
