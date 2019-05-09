@@ -26,14 +26,33 @@ def pad_sents(sents, pad_token):
         than the max length sentence are padded out with the pad_token, such that
         each sentences in the batch now has equal length.
     """
-    sents_padded = []
+    #sents_padded = []
+    """    d = []
+    print(sents)
+    for s in sents:
+        temp = 0
+        for w in s:
+            temp+=len(w)
+        d.append(temp)
+
+    m = np.max(d)
+    for i in range(0,len(sents)):
+        if d[i]<m:
+            print(pad_token*(m-d[i]))
+            s = pad_token*(m-d[i])
+            sents[i].append(s)"""
+    ### !WARNING! Seems that sents is list[list[int]] ###            
+    m = max([len(s) for s in sents])
+    for s in sents:
+        if len(s)<m:
+            s.extend([pad_token]*(m-len(s)))
 
     ### YOUR CODE HERE (~6 Lines)
 
 
     ### END YOUR CODE
 
-    return sents_padded
+    return sents
 
 
 
